@@ -34,7 +34,7 @@ export default {
             tx_ref,
             amount,
             currency: "NGN",
-            redirect_url: "http://localhost:5173/payment-success",
+            redirect_url: link,
             payment_options: "card,banktransfer,ussd",
             customer: {
               email,

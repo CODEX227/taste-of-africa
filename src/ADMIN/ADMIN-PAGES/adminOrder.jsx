@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { FaChevronCircleDown, FaChevronCircleLeft, FaChevronCircleRight, FaChevronDown, FaChevronRight, FaPen } from "react-icons/fa";
+import { FaChevronCircleDown, FaChevronCircleLeft, FaChevronCircleRight, FaChevronDown, FaChevronRight, FaPen, FaWhatsapp } from "react-icons/fa";
 import { FiChevronLeft, FiPenTool } from "react-icons/fi";
-import { IoChatbox, IoChatboxOutline, IoLocationOutline } from "react-icons/io5";
+import { IoCallSharp, IoChatbox, IoChatboxOutline, IoLocationOutline, IoLogoWhatsapp } from "react-icons/io5";
+import { updateOrderStatus } from "../../../DATABASE/handleUser";
 const Aorder = ({AUTH, DB}) => {
     const [page, setpage] = useState(1)
     const [pageQ, setpageQ] = useState(10)
@@ -9,7 +10,18 @@ const Aorder = ({AUTH, DB}) => {
     const [Sval, setSval] = useState('')
     const Sindex = (page -1)*pageQ
     const Eindex = Sindex + pageQ
-    const pageS = Math.ceil(Object.entries(DB.ADMINBLOCK.USERORDERS).filter(([key, value]) => filtered != '' ? value.orderStatus.toLocaleLowerCase() == filtered.toLocaleLowerCase() : filtered == "" ? value : null).length / pageQ)
+    const pageS = Math.ceil(
+    (DB.ADMINBLOCK?.USERORDERS
+        ? Object.entries(DB.ADMINBLOCK.USERORDERS)
+            .filter(([key, value]) =>
+                filtered != ''
+                    ? value.orderStatus.toLocaleLowerCase() == filtered.toLocaleLowerCase()
+                    : filtered == ""
+                        ? value
+                        : null
+            ).length
+        : 0) / pageQ
+)
     const options = ['orderded', 'preparing', 'delivered']
     const [openDrop, setopenDrop] = useState(false)
     const [statusTo, setstatusTo] = useState('')
@@ -27,10 +39,11 @@ const Aorder = ({AUTH, DB}) => {
            </div>
            </div>
            <div className="Aorder-filter">
-            <button value= "" onClick = {(e) => {setfiltered(e.currentTarget.value)}} className= {filtered == "" ? "AF-each AF-each-active" : "AF-each"}>All Orders ({Object.entries(DB.ADMINBLOCK.USERORDERS).length})</button>
-              <button value= "orderded" onClick = {(e) => {setfiltered(e.currentTarget.value)}} className= {filtered == "orderded" ? "AF-each AF-each-active" : "AF-each"}>Ordered ({Object.entries(DB.ADMINBLOCK.USERORDERS).filter(([key, value]) => value.orderStatus.toLocaleLowerCase() == 'orderded'.toLocaleLowerCase()).length})</button>
-              <button className= {filtered == "preparing" ? "AF-each AF-each-active" : "AF-each"} value= "preparing" onClick = {(e) => {setfiltered(e.currentTarget.value)}} >Preparing ({Object.entries(DB.ADMINBLOCK.USERORDERS).filter(([key, value]) => value.orderStatus.toLocaleLowerCase() == 'preparing'.toLocaleLowerCase()).length})</button>
-              <button className= {filtered == "delivered" ? "AF-each AF-each-active" : "AF-each"} value= "delivered" onClick = {(e) => {setfiltered(e.currentTarget.value)}} >Delivered ({Object.entries(DB.ADMINBLOCK.USERORDERS).filter(([key, value]) => value.orderStatus.toLocaleLowerCase() == 'delivered'.toLocaleLowerCase()).length})</button>
+            <button value= "" onClick = {(e) => {setfiltered(e.currentTarget.value)}} className= {filtered == "" ? "AF-each AF-each-active" : "AF-each"}>All Orders ({DB.ADMINBLOCK?.USERORDERS ? Object.entries(DB.ADMINBLOCK.USERORDERS).length : 0})</button>
+              <button value= "orderded" onClick = {(e) => {setfiltered(e.currentTarget.value)}} className= {filtered == "orderded" ? "AF-each AF-each-active" : "AF-each"}>Ordered ({DB.ADMINBLOCK?.USERORDERS ? Object.entries(DB.ADMINBLOCK.USERORDERS).filter(([key, value]) => value.orderStatus.toLocaleLowerCase() == 'orderded'.toLocaleLowerCase()).length : 0})</button>
+              <button className= {filtered == "preparing" ? "AF-each AF-each-active" : "AF-each"} value= "preparing" onClick = {(e) => {setfiltered(e.currentTarget.value)}} >Preparing ({DB.ADMINBLOCK?.USERORDERS ? Object.entries(DB.ADMINBLOCK.USERORDERS).filter(([key, value]) => value.orderStatus.toLocaleLowerCase() == 'preparing'.toLocaleLowerCase()).length : 0})</button>
+              <button className= {filtered == "delivered" ? "AF-each AF-each-active" : "AF-each"} value= "delivered" onClick = {(e) => {setfiltered(e.currentTarget.value)}} >Delivered ({DB.ADMINBLOCK?.USERORDERS ? Object.entries(DB.ADMINBLOCK.USERORDERS).filter(([key, value]) => value.orderStatus.toLocaleLowerCase() == 'delivered'.toLocaleLowerCase()).length : 0})</button>
+              <button className= {filtered == "pickedup" ? "AF-each AF-each-active" : "AF-each"} value= "pickedup" onClick = {(e) => {setfiltered(e.currentTarget.value)}} >Picked Up ({DB.ADMINBLOCK?.USERORDERS ? Object.entries(DB.ADMINBLOCK.USERORDERS).filter(([key, value]) => value.orderStatus.toLocaleLowerCase() == 'pickedup'.toLocaleLowerCase()).length : 0})</button>
            </div>
            <div className="Aorder-body">
                   <div className="AB-left">
@@ -59,7 +72,13 @@ const Aorder = ({AUTH, DB}) => {
                                         <th>Date & Time</th>
                                     </tr>
                                     </thead>
-                                { Object.entries(DB.ADMINBLOCK.USERORDERS).filter(([key, value]) => filtered != '' ?  value.orderStatus.toLocaleLowerCase() == filtered.toLocaleLowerCase() : filtered == '' ? value : null).filter(([key, value]) => key.includes(Sval.toLocaleLowerCase()) || DB.users[value.user].name.toLocaleLowerCase().includes(Sval) || DB.users[value.user].delivery.phone.toLocaleLowerCase().includes(Sval)).slice(Sindex, Eindex).map(([key, each]) => {
+                                    {
+                                       !DB.ADMINBLOCK?.USERORDERS && 
+                                       <th> 
+                                          <td style={{width : "fit-content", margin : 'auto'}}>No Orders exists</td>
+                                       </th>
+                                    }
+                                {DB.ADMINBLOCK?.USERORDERS ? Object.entries(DB.ADMINBLOCK.USERORDERS).filter(([key, value]) => filtered != '' ?  value.orderStatus.toLocaleLowerCase() == filtered.toLocaleLowerCase() : filtered == '' ? value : null).filter(([key, value]) => key.includes(Sval.toLocaleLowerCase()) || DB.users[value.user].name.toLocaleLowerCase().includes(Sval) || DB.users[value.user].delivery.phone.toLocaleLowerCase().includes(Sval)).slice(Sindex, Eindex).map(([key, each]) => {
                                     const date = new Date(each.created_at);
                                             const datePart = date.toLocaleDateString("en-GB", {});
                                             const timePart = date.toLocaleTimeString("en-US", {
@@ -76,12 +95,12 @@ const Aorder = ({AUTH, DB}) => {
                                             <td><span className="ab-ss">{DB.users[each.user].name} <span className="ab-s">{DB.users[each.user].delivery.phone}</span></span></td>
                                             <td>{Object.values(each.items).length} Items</td>
                                             <td className="AB-order-price">₦ {each.total}</td>
-                                            <td className={each.orderStatus == 'orderded' ? 'AB-red AB-order-status' : each.orderStatus == 'preparing' ? 'AB-orange AB-order-status' : each.orderStatus == 'delivered' ? 'AB-green AB-order-status' : ''}> <i>{each.orderStatus.toUpperCase()}</i> </td>
+                                            <td className={each.orderStatus == 'orderded' ? 'AB-red AB-order-status' : each.orderStatus == 'preparing' ? 'AB-orange AB-order-status' : each.orderStatus == 'delivered' ? 'AB-green AB-order-status' : each.orderStatus == "pickedup"? "AB-blue AB-order-status" : ''}> <i>{each.orderStatus.toUpperCase()}</i> </td>
                                             <td><span className="ab-ss">{ datePart.toString() } - <span className="ab-s">{ timePart.toString() }</span></span></td>
                                           </tr>
                                         </thead>
                                 )
-                                })
+                                }) : null
                                 }
                             </table>
 
@@ -125,27 +144,35 @@ const Aorder = ({AUTH, DB}) => {
                             setopenDrop(!openDrop)
                         }
                     >
-                        Orderded 
+                        {DB.ADMINBLOCK.USERORDERS[current.currentactive].orderStatus} 
                         <span> | </span>
                         <FaChevronDown size={10} />
                     </button>
 
                     {openDrop && (
-                        <div className="status-menu" onClick={() => {setopenDrop(false)}}>
-                            <div>
-                                Ordered
-                            </div>
-
-                            <div>
-                                Preparing
-                            </div>
-
-                            <div>
-                                Delivered
-                            </div>
-
-                        </div>
-                    )}
+    DB.ADMINBLOCK.USERORDERS[current.currentactive].orderStatus == "orderded"
+        ? (
+            <div className="status-menu" onClick={() => setopenDrop(false)}>
+                <div onClick={() => {updateOrderStatus(current.currentactive, DB.users[DB.ADMINBLOCK.USERORDERS[current.currentactive].user].Uid, "preparing").then(() => {setopenDrop(false)})}}>Preparing</div>
+                {DB.ADMINBLOCK.USERORDERS[current.currentactive].ORDER_TYPE == "delivery"
+                    ? <div className="SM-diff" onClick={() => {updateOrderStatus(current.currentactive, DB.users[DB.ADMINBLOCK.USERORDERS[current.currentactive].user].Uid, "delivered").then(() => {setopenDrop(false)})}}>Delivered</div>
+                    : DB.ADMINBLOCK.USERORDERS[current.currentactive].ORDER_TYPE == "pickup"
+                        ? <div className="SM-diff"  onClick={() => {updateOrderStatus(current.currentactive, DB.users[DB.ADMINBLOCK.USERORDERS[current.currentactive].user].Uid, "pickedup").then(() => {setopenDrop(false)})}}>Picked up</div>
+                        : ''
+                }
+            </div>
+        )
+        : DB.ADMINBLOCK.USERORDERS[current.currentactive].orderStatus == "preparing" ? (
+            <div className="status-menu" onClick={() => setopenDrop(false)}>
+                {DB.ADMINBLOCK.USERORDERS[current.currentactive].ORDER_TYPE == "delivery"
+                    ? <div className="SM-diff" onClick={() => {updateOrderStatus(current.currentactive, DB.users[DB.ADMINBLOCK.USERORDERS[current.currentactive].user].Uid, "delivered").then(() => {setopenDrop(false)})}}>Delivered</div>
+                    : DB.ADMINBLOCK.USERORDERS[current.currentactive].ORDER_TYPE == "pickup"
+                        ? <div className="SM-diff" onClick={() => {updateOrderStatus(current.currentactive, DB.users[DB.ADMINBLOCK.USERORDERS[current.currentactive].user].Uid, "pickedup").then(() => {setopenDrop(false)})}}>Picked up</div>
+                        : ''
+                }
+            </div>
+        ) : null
+)}
 
                 </div>
                     </div>
@@ -156,7 +183,7 @@ const Aorder = ({AUTH, DB}) => {
                           <FaPen size={10} style={{color :'black'}}/>
                        </div>
                        <div className="info-box">
-                          <div style={{backgroundImage : `url(${DB.users[DB.ADMINBLOCK.USERORDERS[current.currentactive].user].profile.profileImgSrc})`, backgroundPosition: 'center', backgroundSize : 'cover', width : '80px', height : '80px', border: '0.01px solid rgb(255, 255, 255, .2)', borderRadius:'100%', padding:'0%'}}></div>
+                          <div style={{border : '0.1px solid rgb(0, 0, 0, .3)',backgroundImage : `url(${DB.users[DB.ADMINBLOCK.USERORDERS[current.currentactive].user].profile.profileImgSrc})`, backgroundPosition: 'center', backgroundSize : 'cover', width : '80px', height : '80px', borderRadius:'100%', padding:'0%'}}></div>
                           <div className="info-rl">
                             <span className="info-rl-head">{DB.users[DB.ADMINBLOCK.USERORDERS[current.currentactive].user].name}</span>
                             <span className="info-rl-avrg">{DB.users[DB.ADMINBLOCK.USERORDERS[current.currentactive].user].delivery.phone}</span>
@@ -239,9 +266,10 @@ const Aorder = ({AUTH, DB}) => {
 
                        
                    </div>
-
-                   <button className="upadate-btn" style={{width : '100%'}}>Update Order</button>
-
+                   <div className="already-user-btn">
+                   <a href= {`tel:${DB.users[DB.ADMINBLOCK.USERORDERS[current.currentactive].user].delivery.phone}`}><button className="upadate-btn" style={{width : '100%', display : 'flex', gap : '12px', height : 'fit-content', alignItems : 'center', justifyContent : 'center', fontWeight : 'bold', border : '0.02px solid #c43400', backgroundColor : 'transparent', color : '#c43400', marginBottom : '6px'}}><IoCallSharp size={20} /> Call User</button></a>
+                   <a href= {`https://wa.me/${DB.users[DB.ADMINBLOCK.USERORDERS[current.currentactive].user].delivery.phone}`}><button className="upadate-btn" style={{width : '100%', display : 'flex', gap : '12px', height : 'fit-content', alignItems : 'center', justifyContent : 'center', fontWeight : 'bold'}}><IoLogoWhatsapp size={20} /> Message User</button></a>
+                   </div>
                </div>
                 </div>}
         </div>

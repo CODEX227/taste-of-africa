@@ -6,17 +6,12 @@ import { Route, Routes } from "react-router-dom"
 import Signin from './signin'
 import Signup from './signup'
 import Homepage from './HOMEPAGE/homepage'
-import Logerr from './MESSAGES/err'
-import { auth } from '../DATABASE/handleUser'
+import { auth, getdata, GetData_Customer } from '../DATABASE/handleUser'
 import { onAuthStateChanged } from 'firebase/auth'
 import Order from './MENU/menu'
-import Nav from './Homepage/Nav'
 import MainLayout from './LAYOUT/mainlayout'
-import { IoInformation } from 'react-icons/io5'
-import { getdata } from '../DATABASE/handleUser'
 import Contact from './CONTACT/contact'
 import Settings from './SETTINGS/settings'
-import About from './ABOUT/about'
 import Cart from './CART/cart'
 import Alayout from './LAYOUT/adminlayout'
 import Ahome from './ADMIN/adminHome'
@@ -35,34 +30,68 @@ function App() {
     once: true,
     offset: 100
 });
-
-
 useEffect(() => {
-  const timeout = setTimeout(() => {
-    console.log("Time out");
-    setneterr(true)
-  }, 15000);
+    let timeout;
+    let unsubscribe;
 
-  const unsubscribe = getdata(
-    (data) => {
-      clearTimeout(timeout); // Data arrived before 12 seconds
-      setdb(data);
-      setneterr(false)
-    },
-    (error) => {
-      clearTimeout(timeout); // Stop the timeout if an error occurs
-      console.log(error.code);
-      console.log(error.message);
+    if (userDetails && userDetails.uid) {
+      console.log(userDetails)
+
+        const user_Extract = userDetails.reloadUserInfo.customAttributes;
+        const refined_user = JSON.parse(user_Extract);
+
+        if (refined_user.user === "customer") {
+
+            timeout = setTimeout(() => {
+                console.log("Time out");
+                setneterr(true);
+            }, 15000);
+
+            unsubscribe = GetData_Customer(
+                (data) => {
+                    clearTimeout(timeout);
+                    setdb(data);
+                    setneterr(false);
+                },
+                (error) => {
+                    clearTimeout(timeout);
+                    console.log(error.code);
+                    console.log(error.message);
+                },
+                userDetails.uid
+            );
+
+        } else if (
+            refined_user.user === "super_ADMIN" ||
+            refined_user.user === "ADMIN"
+        ) {
+
+            timeout = setTimeout(() => {
+                console.log("Time out");
+                setneterr(true);
+            }, 15000);
+
+            unsubscribe = getdata(
+                (data) => {
+                    clearTimeout(timeout);
+                    setdb(data);
+                    setneterr(false);
+                },
+                (error) => {
+                    clearTimeout(timeout);
+                    console.log(error.code);
+                    console.log(error.message);
+                },
+                userDetails.uid
+            );
+        }
     }
-  );
 
-  return () => {
-    clearTimeout(timeout);
-    unsubscribe();
-  };
-}, []);
-
-
+    return () => {
+        if (timeout) clearTimeout(timeout);
+        if (unsubscribe) unsubscribe();
+    };
+}, [userDetails]);
 useEffect(() => {
   const unsubscribe = onAuthStateChanged(auth, (user) => {
     setuserDetails(user)
@@ -70,16 +99,20 @@ useEffect(() => {
 }, [userDetails]);
 
 
+useEffect(() => {
+  db && console.log(db)
+}, [db])
 
-
+useEffect(() => {
+  userDetails && console.log("userDetails" ,userDetails)
+}, [userDetails])
 
   return (
     <>
-    <Routes>
+   <Routes>
       <Route path='/' element = { <Signin db = {db}/>}/>
       <Route path='/enter' element = { <Signup />}/> 
       <Route path = '/settings' exact element = {Object.keys(db).length > 0 && userDetails !== null ? <Settings info = {userDetails}  information = { db } /> : ''} />
-
             <Route element = { <MainLayout neterr = {neterr} info = {userDetails}  information = { db }/> }>
                   <Route path='/cart' exact element = {<Cart info = {userDetails} information = {db}/>} />
                   <Route path='/homepage' exact element =  {<Homepage info = { userDetails } information={db}/>} />
@@ -89,7 +122,6 @@ useEffect(() => {
                   <Route path='/Yorders' exact element = {<Orders info = {userDetails}  information = {db}/>} />
                   <Route path = "/payment-success" element = {<CheckPay info = {userDetails} information = {db} />} />
            </Route>
-
            <Route element = {<Alayout neterr = {neterr} info = {userDetails}  information = { db }/> }>
               <Route path = '/admin-dashboard/*' exact element = {<Ahome AUTH = {userDetails}  DB = { db } />} />
            </Route>

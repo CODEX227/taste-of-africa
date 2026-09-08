@@ -27,14 +27,10 @@ const Alayout = ({info, information, neterr}) => {
         {
         ready ?
                         <div>
-                            { information.users[info.uid].role == "admin" &&
-                                        (
-                                            <>
-                                                <Outlet />
-                                            </>
-                                    )
-                            }
-                        </div>:<Loader/>
+                                        <>
+                                           <Outlet />
+                                        </>
+                        </div>:<Loader />
          }
       </>
      );

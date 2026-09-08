@@ -42,7 +42,7 @@ export default {
         }
       );
 
-      const data = await response.json();
+      const data = await response.json().once();
 
       return Response.json(
         {

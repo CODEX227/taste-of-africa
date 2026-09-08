@@ -3,9 +3,9 @@ import { addreservation } from "../../DATABASE/handleUser";
 import Loader from "../LOADER/loader";
 
 const Res = ({info, information}) => {
-    const [name, setname] = useState(information.users[info.uid].name)
+    const [name, setname] = useState(information.users.name)
     const [phone, setphone] = useState()
-    const [email, setemail] = useState(information.users[info.uid].email)
+    const [email, setemail] = useState(information.users.email)
     const [date, setdate] = useState("")
     const [time, settime] = useState("")
     const [guests, setguests] = useState(1)

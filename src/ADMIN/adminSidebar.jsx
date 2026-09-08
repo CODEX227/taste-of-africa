@@ -18,7 +18,6 @@ const Asidebar = ({AUTH, DB, side}) => {
                 <NavLink className="admin-side-btn" to='/admin-dashboard/orders'><FaUtensils size = {16} />Orders</NavLink>
                 <NavLink className="admin-side-btn" to='/admin-dashboard/reviews'><FaStar size = {16} />Reviews</NavLink>
                 <NavLink className="admin-side-btn" to='/admin-dashboard/coupons'><IoTicket size = {16} />Coupons</NavLink>
-                <NavLink className="admin-side-btn" to='/admin-dashboard/payments'><FaCreditCard size = {16} />Payments</NavLink>
                 <NavLink className="admin-side-btn" to='/admin-dashboard/admin-settings'><IoSettingsSharp size = {16} />Settings</NavLink>
             </div>
             <button className="admin-side-del-btn" onClick={() => {signout(auth); navigate("/")}}><FiLogOut size = {16} />Log Out</button>

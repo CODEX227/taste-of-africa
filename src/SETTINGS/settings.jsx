@@ -2,16 +2,20 @@ import { IoLocationOutline, IoSettingsSharp } from 'react-icons/io5';
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from "react-router";
 import Foot from '../HOMEPAGE/foot';
-import { FiMail,FiArrowLeft, FiCamera, FiSettings, FiUser, FiCalendar, FiCheck, FiClock, FiCreditCard, FiShield, FiShieldOff, FiAlertTriangle, FiBell, FiCommand, FiInfo, FiEdit, FiHexagon } from "react-icons/fi";
+import { FiMail,FiArrowLeft, FiCamera, FiSettings, FiUser, FiCalendar, FiCheck, FiClock, FiCreditCard, FiShield, FiShieldOff, FiAlertTriangle, FiBell, FiCommand, FiInfo, FiEdit, FiHexagon, FiAlertOctagon, FiOctagon } from "react-icons/fi";
 import img from '../assets/prof.png'
 import { FaArrowUp, FaBus, FaEnvelope, FaTruck } from 'react-icons/fa';
-import { addProfile, delinformation } from '../../DATABASE/handleUser';
+import { addProfile, delinformation, dissableAccount } from '../../DATABASE/handleUser';
 import { useLocation } from 'react-router';
 
 const Settings = ({information, info}) => {
  const [delInfo, setdelInfo] = useState({
-    adress: information.users[info.uid].delivery ? information.users[info.uid].delivery.adress : '',
-    phone : information.users[info.uid].delivery ? information.users[info.uid].delivery.phone : ''
+    adress: information.users
+    .delivery ? information.users
+    .delivery.adress : '',
+    phone : information.users
+    .delivery ? information.users
+    .delivery.phone : ''
  }) 
  const location = useLocation();
     useEffect(() => {
@@ -26,7 +30,22 @@ const Settings = ({information, info}) => {
         }
         }
     }, [location]);
-
+async function dissableAccount(id) {
+    const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dissableAccount`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                uid: id
+            })
+        }
+    );
+    const data = await response.json();
+    console.log(data);
+}
     useEffect(() => {
     },[information, info])
             const navigate = useNavigate()
@@ -66,6 +85,7 @@ const Settings = ({information, info}) => {
             }
         })
         }
+const [deleteMessage, setdeleteMessage] = useState(false)        
     return ( 
         <>
 <div className='settings-con'>
@@ -79,16 +99,19 @@ const Settings = ({information, info}) => {
                             </div>
                                     <button className='settings-back-btn' onClick={() => {navigate(-1)}}><FiArrowLeft size={12} style = {{color:'white'}}/>Back</button>
                     </div>
-                    <div className="prof-info-con">
+                    
+                    <div className="all-settings-con">
+                        <div className="prof-info-con">
                         <div className="top-con">
-                            <FiHexagon size={30} />
+                            <FiOctagon size={30} />
                             <div className="settings-txtss">
                                         <span className="settings-txt11">Profile Information</span>
                                         <span className='settings-txt2'>Update your profile details and how others see you</span>
                                 </div>
                         </div>
                                 <div className="prof-info-main">
-                                        <div className="prof-image" style={{backgroundImage : `url(${information.users[info.uid].profile.profileImgSrc})`, border :'0.02px solid black'}}>
+                                        <div className="prof-image" style={{backgroundImage : `url(${information.users
+                                            .profile.profileImgSrc})`, border : '0.2px solid rgb(196, 52, 0, .8)'}}>
                                             <FiCamera  size = {15} className="prof-image-i" onClick={() => imgRef.current.click()}/>
                                             <input type="file" style ={{display : 'none'}} ref={imgRef} onChange={(e)=> addProf(e.target.files[0])}/>
                                         </div>
@@ -96,9 +119,11 @@ const Settings = ({information, info}) => {
                                              <div className="p-d-c"><label>Full Name:</label>
                                              <input type="text"/></div>
                                              <div className="p-d-c"><label>Username:</label>
-                                             <input type="text" placeholder={information.users[info.uid].name}/></div>
+                                             <input type="text" placeholder={information.users
+                                                .name}/></div>
                                              <div className="p-d-c"><label>Email Address:</label>
-                                             <input type="email" placeholder={information.users[info.uid].email} /></div>
+                                             <input type="email" placeholder={information.users
+                                                .email} /></div>
                                              <div className="p-d-c"><label>Phone:</label>
                                              <input type="tel" /></div>
                                              <textarea placeholder='Review'></textarea>
@@ -140,11 +165,16 @@ const Settings = ({information, info}) => {
                                                             delinformation(info.uid, delInfo)
                                                                 }}>
                                              <div className="p-d-c"><label>Location:</label>
-                                             <input type="text" value={delInfo.adress} onChange={e => {setdelInfo((prev) => ({...prev, adress : e.target.value}))}} placeholder={information.users[info.uid].delivery ? information.users[info.uid].delivery.adress : ''}/></div>
+                                             <input type="text" value={delInfo.adress} onChange={e => {setdelInfo((prev) => ({...prev, adress : e.target.value}))}} placeholder={information.users
+                                                .delivery ? information.users
+                                                .delivery.adress : ''}/></div>
                                              <div className="p-d-c"><label>Phone Number:</label>
-                                             <input type="tel" value={delInfo.phone} onChange={e => {setdelInfo((prev) => ({...prev, phone : e.target.value}))}} placeholder= {information.users[info.uid].delivery && information.users[info.uid].delivery.phone}/></div>
+                                             <input type="tel" value={delInfo.phone} onChange={e => {setdelInfo((prev) => ({...prev, phone : e.target.value}))}} placeholder= {information.users
+                                                .delivery && information.users
+                                                .delivery.phone}/></div>
                                              <textarea placeholder='Describe More'></textarea>
-                                             <button className='make-changes'>{information.users[info.uid].delivery ? 'Edit Information' : 'Set Information'}</button>
+                                             <button className='make-changes'>{information.users
+                                             .delivery ? 'Edit Information' : 'Set Information'}</button>
                         </form>
                     </div>
 
@@ -166,7 +196,36 @@ const Settings = ({information, info}) => {
                             </div>
                         </div>
                     </div>
-                    <div className="prof-info-con" style={{backgroundColor: 'rgb(255, 0, 0,.05)'}}>
+
+                    <div className="prof-info-con">
+                        <div className="top-con">
+                            <FiAlertOctagon size={30} />
+                          <div className="settings-txtss">
+                            <span className="settings-txt11">Authentication</span>
+                            <span className='settings-txt2'>Manage your security details</span>
+                          </div>
+                        </div>
+                       <form className="profile-details-con">
+                                             <div className="p-d-c">
+                                             <label>New Password:</label>
+                                             <input type="password"/>
+                                             </div>
+                                             <div className="p-d-c">
+                                             <label>Confirm Password:</label>
+                                             <input type="password"/>
+                                             </div>
+                                             <button className='make-changes'>Change Password</button>
+                        </form>
+                       <form className="profile-details-con">
+                                             <div className="p-d-c">
+                                             <label>New Email:</label>
+                                             <input type="password"/>
+                                             </div>
+                                             <button className='make-changes'>Change Email</button>
+                        </form>
+                    </div>
+
+                    <div className="prof-info-con" style={{backgroundColor: 'rgb(255, 0, 0,.05)', height : "fit-content"}}>
                         <div className="top-con">
                             <FiAlertTriangle size={30}/>
                             <div className="settings-txtss">
@@ -175,10 +234,24 @@ const Settings = ({information, info}) => {
                         </div>
                         </div>
                         <div className="acc-details">
-                            <button className="del-acc">Delete Account</button>
+                            <button onClick={(() => {setdeleteMessage(true)})}  className="del-acc">Delete Account</button>
                         </div>
                     </div>
-                    {/* <Foot information = {information}/> */}
+                    </div>
+
+                    {deleteMessage && <div className="foodDerr-con">
+                                <div className="foodDerr">
+                                <span>Do you want to Disable this Account owned by <span style={{color : '#c43000'}}>{information.users
+                                .name.toUpperCase()}</span></span>
+                                <div className="fde-btns">
+                                    <button onClick={() => {setdeleteMessage(false)}}>Cancel</button>
+                                    <button style={{
+                                        backgroundColor : '#c43000', 
+                                        color : 'white'
+                                        }} onClick={()=> {dissableAccount(info.uid).then(() => {setdeleteMessage(false)}).catch(e => {console.log(e)})}}>Disable</button>
+                                </div>
+                            </div>
+                            </div>}
         </ div>
         </>
      );

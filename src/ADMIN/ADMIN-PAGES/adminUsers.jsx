@@ -1,7 +1,45 @@
-import { FaChevronDown, FaChevronUp, FaEllipsisH, FaEllipsisV } from "react-icons/fa";
+import { useState } from "react";
+import { FaChevronDown, FaChevronUp, FaEllipsisV } from "react-icons/fa";
 import { FiUser, FiUserCheck, FiUserMinus, FiUserPlus } from "react-icons/fi";
 
 const Ausers = ({DB, AUTH}) => {
+    const [openAction, setopenAction] = useState("")
+    const [deleteMessage, setdeleteMessage] = useState("")
+
+
+    async function dissableAccount(id) {
+    const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dissableAccount`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                uid: id
+            })
+        }
+    );
+    const data = await response.json();
+    console.log(data);
+}
+
+    async function enableAccount(id) {
+    const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/enableAccount`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                uid: id
+            })
+        }
+    );
+    const data = await response.json();
+    console.log(data);
+}
     return ( 
         <div className="A-users">
             <div className="dash-head">
@@ -95,7 +133,7 @@ const Ausers = ({DB, AUTH}) => {
               <div className="up-main-box">
                 {Object.values(DB.users).map((each, i) => {
                     return(
-                 <div className="each-up" key={i}>
+                 <div className="each-up" key={each.Uid}>
                     <div className="each-up-inside">
                         <div className="up-primary-details">
                             <div className="up-profile-img" style={{backgroundImage : `url(${each.profile.profileImgSrc})`, border : '0.02px solid grey'}}></div>
@@ -113,17 +151,36 @@ const Ausers = ({DB, AUTH}) => {
                                 </span> : null}
                             </div>
                         </div>
-                        <div className="xra-uppt-details">
+                       <div className="xra-uppt-details">
                             <div className="uppt-show-con">
-                                  <FaEllipsisV size={15} className="uppt-i" onClick={(e) => {e.target.nextElementSibling.style.display = "flex"}}/>
-                                  <div className="xra-uppt-details-main">
-                                     <div className="xudm-btn"><button onClick={(e) => {e.target.parentElement.parentElement.style.display = "none"}}>X</button></div>
-                                     <button className="xudm-btns">Message user</button>
-                                     <button className="xudm-btns">Copy User Contact</button>
-                                     <button className="xudm-btns xudm-diff">Dissable Account</button>
-                                  </div>
+                                  <FaEllipsisV size={15} className="uppt-i" onClick={() => {setopenAction(each.Uid)}}/>
+                                 { openAction == each.Uid ? <div className="xra-uppt-details-main">
+                                            {deleteMessage && <div className="foodDerr-con">
+                                                <div className="foodDerr">
+                                                <span>Do you want to {each.active == true ? "Disable" : each.active == false ? "Enable" : null} this Account owned by <span style={{color : '#c43000'}}>{each.name.toUpperCase()}</span></span>
+                                                <div className="fde-btns">
+                                                    <button onClick={() => {setdeleteMessage(false)}}>Cancel</button>
+                                                    { each.active == true ?  <button style={{
+                                                        backgroundColor : '#c43000', 
+                                                        color : 'white'
+                                                        }} onClick={()=> {dissableAccount(openAction).then(() => {setdeleteMessage(false)}).catch(e => {console.log(e)})}}>Disable</button> : each.active == false ?
+                                                        <button style={{
+                                                        backgroundColor : '#c43000',
+                                                        color : 'white'
+                                                        }} onClick={()=> {enableAccount(openAction).then(() => {setdeleteMessage(false)}).catch(e => {console.log(e)})}}>Enable</button> : null 
+                                                    }
+                                                </div>
+                                            </div>
+                                            </div>}
+                                     <div className="xudm-btn"><button onClick={() => {setopenAction("")}}>X</button></div>
+                                     <button className="xudm-btns"><a  style={{width : '100%', height : '100%', color : 'rgb(0, 0, 0, .8'}} href={`https://wa.me/${each?.delivery?.phone}`} target="_blank">
+                                        WhatsApp
+                                    </a></button>
+                                     <button style={{color : 'rgb(0, 0, 0, .8'}} className="xudm-btns" onClick={() => {navigator.clipboard.writeText(each?.delivery?.phone);}}>Copy User Contact</button>
+                                     {each.active == true ? <button className="xudm-btns xudm-diff" onClick={() => {setdeleteMessage(true)}}>Dissable Account</button>: each.active == false ? <button className="xudm-btns xudm-diff enable-btn" onClick={() => {setdeleteMessage(true)}}>Enable Account</button> : null}
+                                  </div> : null}
                             </div>
-                        </div>
+                        </div> 
                     </div>
                 </div>
                    )

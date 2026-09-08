@@ -31,7 +31,7 @@ const Order = ({info, information}) => {
     }
 
     useEffect(() => {
-        setnewdata(Object.values(information.food.foodlisting).filter(each => {
+        setnewdata(Object.values(information.food?.foodlisting ? information.food.foodlisting : []).filter(each => {
             if(searchval !== 'all'){
                 return each.name.includes(searchval.trim().toLocaleLowerCase()) || each.type.includes(searchval.trim().toLocaleLowerCase())
             }else if(searchval == 'all'){
@@ -39,13 +39,12 @@ const Order = ({info, information}) => {
             }
         }))
 
-        console.log(newdata,Object.values(information.food.foodlisting))
     },[searchval])
 
     return ( 
     <>
     
-        { Object.values(info).length !== 0 && Object.values(information).length !== 0 ? 
+        { Object.values(info).length !== 0 && Object.values(information).length !== 0 && Object.values(information.food?.foodlisting ? information.food.foodlisting : [])? 
         <div className="order-con">
 
             <div className="order-hero" style={{backgroundImage : `url(https://res.cloudinary.com/qnmxixxc/image/upload/v1784152467/c8bnknhptu0kz6h9eyys.png)`}}>
@@ -68,17 +67,17 @@ const Order = ({info, information}) => {
 
              <div className="food-listing">
                 {
-                    (newdata).map((each, index) => {
+                   newdata && newdata.filter((each) => {return each.disabled !== true}).map((each, index) => {
                         let Wlist = false
                         return (
                             <div className="each-food" key={index}>
-                            <div className="each-food-img" style={{backgroundImage : `url(${each.imgsrc})`}}><div className="rate"><p>{each.rating}<FaStar className='rate-i' size={9} /></p></div></div>
+                            <div className="each-food-img" style={{backgroundImage : `url(${each.imgsrc})`}}> <div className='whobah' style={{backgroundColor : each.status == 'out of stock' ? 'red' : 'yellowgreen'}}></div> <div className="rate"><p>{each.rating}<FaStar className='rate-i' size={9} /></p></div></div>
                         <div className="food-first-con">
                                 <p className="food-name">{ each.name }</p>
                                 <p className="food-jaara">{ each.shrt }</p>
                             <div className="food-sec-con">
                                 <p className="food-price">₦{ each.price }</p>
-                                <button onClick={() => {      
+                                <button disabled = {each.status == "out of stock" ? true : false} style={{opacity : each.status == "out of stock" ? '.4' : "1"}} onClick={() => {      
                                     const cartid = Math.random().toString(36).slice(2, 10);                             
                                     addcart(info.uid, {foodid : each.foodid, cartid : cartid, quantity: 1}, cartid)
                                     setsucmes('Added Successfully')

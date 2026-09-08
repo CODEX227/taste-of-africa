@@ -6,16 +6,13 @@ import Ausers from "./ADMIN-PAGES/adminUsers";
 import Aorder from "./ADMIN-PAGES/adminOrder";
 import Acoupons from "./ADMIN-PAGES/adminCoupons";
 import Amenu from "./ADMIN-PAGES/adminMenu";
-import Apayments from "./ADMIN-PAGES/adminPayment";
 import Areviews from "./ADMIN-PAGES/adminReviews";
 import Aacc from "./ADMIN-PAGES/adminAcc";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 
 const Ahome = ({AUTH, DB, sidefrom}) => {
     const [side, setside] = useState(false)
-    useEffect(() => {
-    },[])
     function sidefrom(data){
         setside(data)
     }
@@ -32,7 +29,6 @@ const Ahome = ({AUTH, DB, sidefrom}) => {
                         <Route path="/users" exact element = {<Ausers AUTH = {AUTH} DB = {DB}/>}/>
                         <Route path="/orders" exact element = {<Aorder AUTH = {AUTH} DB = {DB}/>} />
                         <Route path="/coupons" exact element = {<Acoupons AUTH = {AUTH} DB = {DB}/>} />
-                        <Route path="/payments" exact element = {<Apayments AUTH = {AUTH} DB = {DB}/>} />
                         <Route path="/reviews" exact element = {<Areviews AUTH = {AUTH} DB = {DB}/>} />
                         <Route path="/admin-settings" exact element = {<Aacc AUTH = {AUTH} DB = {DB}/>} />
                         <Route path="/menu" exact element = {<Amenu AUTH = {AUTH} DB = {DB} /> }/>

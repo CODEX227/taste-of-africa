@@ -10,6 +10,9 @@ const Anavbar = ({AUTH, DB, sidefrom}) => {
     useEffect(() => {
         sidefrom(side)
     },[side])
+    useEffect(() => {
+       console.log ("auth" ,AUTH)
+    },[AUTH])
     return ( 
         <>
         <div className="admin-navbar">
@@ -17,7 +20,7 @@ const Anavbar = ({AUTH, DB, sidefrom}) => {
             <div className="left-admin-nav">
                 <div className="admin-nots"><FaBell size ={16} /></div>
                 <div className="admin-profile-con">
-                    <span className="admin-prof-img" style={{backgroundImage : `url(${prof})`}}></span>
+                    <span className="admin-prof-img" style={{backgroundImage : `url(${DB.users[AUTH.uid].profile.profileImgSrc})`}}></span>
                     <span className="q-A">
                         <span className="q-A-head">{DB.users[AUTH.uid].name}</span>
                         <span className="q-A-mini">{DB.users[AUTH.uid].role}</span>

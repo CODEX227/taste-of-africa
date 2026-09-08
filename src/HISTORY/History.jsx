@@ -13,7 +13,7 @@ const History = () => {
                     <p className="yourorder-head">Your History</p>
                     <p className="yourorder-mini">Check through your order history</p>
                 </div>
-                <select id="" id= "select">
+                <select id= "select">
                     <option value="">All Active Orders</option>
                 </select>
             </div>
@@ -272,32 +272,7 @@ const History = () => {
                             </div>
                         </div>
                 </div>
-                <div className="yr-last">
-                    <div className="each-yr-last">
-                        <FaIdCard size={15} className="yr-last-i" />
-                        <div className="yr-last-txts">
-                            <span className="ylt-head">Payment Method</span>
-                            <span className="ylt-mini">Bank Transfer</span>
-                        </div>
-                    </div>
-                    <div className="each-yr-last">
-                        <IoLocationOutline size={15} className="yr-last-i" />
-                        <div className="yr-last-txts">
-                            <span className="ylt-head">Delivery Adreess</span>
-                            <span className="ylt-mini">15, Awolowo Road, ibadan, Oyo State</span>
-                        </div>
-                    </div>
-                    <div className="each-yr-last">
-                        <FiCheckCircle size={15} className="yr-last-i" style={{color:'green'}}/>
-                        <div className="yr-last-txts">
-                            <span className="ylt-head">Payment Status</span>
-                            <span className="ylt-mini">Paid</span>
-                        </div>
-                    </div>
-                </div>
-                <div className="yt-btns">
-                    <button className="yt-btn">Order Again</button>
-                </div>
+               
                 <FaChevronDown size={11} className="see-more"/>
 
             </div>

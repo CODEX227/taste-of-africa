@@ -29,14 +29,12 @@ const MainLayout = ({info, information, neterr}) => {
         {
         ready ?
                         <div>
-                            { information.users[info.uid].role == "customer" &&
                                         (
                                         <>
                                            <Nav info = {info} information={information} />
                                            <Outlet />
                                         </>
                                     )
-                            }
                         </div>:<Loader />
          }
       </>
